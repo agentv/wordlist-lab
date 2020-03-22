@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="plaintext" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+    <types:type name="collection" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+    <types:type name="mini_words" format="csv">
+      <types:shape format="weave" example="examples/mini-moby.txt"><![CDATA[%dw 2.0
+
+type mini_words = Array<{| aa: String |}>
+
+]]></types:shape>
+      <types:properties>
+        <types:property name="headerLineNumber" value="0"/>
+        <types:property name="header" value="true"/>
+        <types:property name="isQuotedString" value="false"/>
+        <types:property name="separator" value=","/>
+      </types:properties>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#7e7cb6ad-49fe-4e00-b50d-07d682ec72f2"/>
+  <types:enrichment select="#558ee195-b8fc-4a60-b109-7d2fe0dfadaf">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="mini_words"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

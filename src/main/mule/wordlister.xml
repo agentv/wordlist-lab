@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<file:config name="File_Config" doc:name="File Config" doc:id="b93f92c5-b71b-43fd-b6c0-8be9ea939d54">
+		<file:connection workingDir="/Users/vincentlowe/AnypointStudio/Labs/wordlister/src/main/resources" />
+	</file:config>
+	<flow name="wordlisterFlow" doc:id="c9f9cc4b-78c7-434a-9cc1-50dddc371e92" >
+		<scheduler doc:name="Scheduler" doc:id="1930c2c1-fb85-4b43-b540-1b8ed072d013" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="15000"/>
+			</scheduling-strategy>
+		</scheduler>
+		<set-variable value="#[{}]" doc:name="byInitial" doc:id="7641d5c9-e6bb-4c82-8377-d12199d869c1" variableName="byInitial"/>
+		<set-variable value="#[{}]" doc:name="byLength" doc:id="0d6e886a-6ed7-4721-8bd0-f4bf81c59571" variableName="byLength"/>
+		<ee:transform doc:name="Capture Wordlist" doc:id="7e7cb6ad-49fe-4e00-b50d-07d682ec72f2">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+var wl = readUrl("classpath://sourcefiles/MOBY-CROSSWD.TXT","text/plain")
+---
+wl splitBy (/\r\n/)]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+			</ee:variables>
+		</ee:transform>
+		<foreach doc:name="For Each" doc:id="d7907e84-419f-4c51-8c3f-2d481fb9c89f" doc:description="new plan is to use reduce operation to profile lentrh and initial">
+			<logger level="INFO" doc:name="Logger" doc:id="694eb9d8-4b48-4729-8b6b-c1f6a9f88c99" message='#[output text/plain --- "\nlooking at entry: " ++ (payload default "unknown")]'/>
+			<ee:transform doc:name="Transform Message" doc:id="0d73aa6e-e66b-409d-bba4-f72f917d8441" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="byInitial" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</foreach>
+	</flow>
+</mule>
